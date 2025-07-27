@@ -28,10 +28,10 @@ app.get('/:room', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-	socket.on('join-room', (roomID, userID) => {
-		console.log(`User ${userID} joined room ${roomID}`);
+	socket.on('join-room', (roomID, userID, userName = 'Anonymous') => {
+		console.log(`User ${userName} (${userID}) joined room ${roomID}`);
 		socket.join(roomID);
-		socket.to(roomID).emit('user-connected', userID);
+		socket.to(roomID).emit('user-connected', userID, userName);
 
 		socket.on('disconnect', () => {
 			socket.to(roomID).emit('user-disconnected', userID);
