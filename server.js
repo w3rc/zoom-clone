@@ -1,19 +1,27 @@
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);
+require('dotenv').config();
+
+const SERVER_PORT = process.env.SERVER_PORT || 7000;
+const PEER_PORT = process.env.PEER_PORT || 7001;
+const ALLOWED_ORIGINS = process.env.CORS_ORIGINS
+        ? process.env.CORS_ORIGINS.split(',')
+        : [`http://localhost:${SERVER_PORT}`];
+
 const io = require('socket.io')(server, {
-	cors: {
-		origin: "*",
-		methods: ["GET", "POST"]
-	}
+        cors: {
+                origin: ALLOWED_ORIGINS,
+                methods: ["GET", "POST"]
+        }
 });
 const { v4: uuidV4 } = require('uuid');
 const { PeerServer } = require('peer');
 
-const peerServer = PeerServer({ 
-	port: 7001, 
-	path: '/',
-	allow_discovery: true
+const peerServer = PeerServer({
+        port: PEER_PORT,
+        path: '/',
+        allow_discovery: true
 });
 
 app.set('view engine', 'ejs');
@@ -39,7 +47,7 @@ io.on('connection', (socket) => {
 	});
 });
 
-server.listen(7000, () => {
-	console.log('Server listening on http://localhost:7000');
-	console.log('PeerJS server running on port 7001');
+server.listen(SERVER_PORT, () => {
+        console.log(`Server listening on http://localhost:${SERVER_PORT}`);
+        console.log(`PeerJS server running on port ${PEER_PORT}`);
 });
